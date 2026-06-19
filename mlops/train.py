@@ -30,9 +30,9 @@ def get_model_and_flavor(params):
 def run_training():
     # 1. Cargar datos
     df_model_v3 = pd.read_csv("../dataset/data_procesada.csv") 
-    X = df_model_v3.drop(columns=["customer_id", "target"])
+    X = df_model_v3.drop(columns=["customer_id", "target","trend_direction"])
     y = df_model_v3["target"]
-    X = pd.get_dummies(X, columns=["segment", "territory_id"], drop_first=True)
+    # X = pd.get_dummies(X, columns=["segment", "territory_id"], drop_first=True)
     
     # 2. Split y Desbalanceo
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)

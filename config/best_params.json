@@ -1,0 +1,6 @@
+{
+    "model_type": "xgboost",
+    "n_estimators": 331,
+    "max_depth": 7,
+    "learning_rate": 0.06962996591354534
+}

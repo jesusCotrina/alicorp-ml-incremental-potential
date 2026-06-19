@@ -1,0 +1,49 @@
+name: Pipeline MLOps - Alicorp Incremental Potential
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+defaults:
+  run:
+    working-directory: mlops 
+
+jobs:
+  pruebas_y_calidad:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r ../requirements.txt
+
+      - name: Ejecutar Tests
+        run: |
+          pytest ../test/test_pipeline.py -v
+
+  entrenamiento_y_staging:
+    needs: pruebas_y_calidad
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Entrenamiento
+        run: |
+          python train.py
+
+      - name: Promocionar a Staging
+        run: |
+          python promote_model.py staging
+
+  despliegue_produccion:
+    needs: entrenamiento_y_staging
+    runs-on: self-hosted
+    environment: 
+      name: production
+    steps:
+      - name: Promocionar a Producción
+        run: |
+          python promote_model.py production

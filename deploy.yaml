@@ -42,7 +42,7 @@ jobs:
     needs: entrenamiento_y_staging
     runs-on: self-hosted
     environment:
-      name: production # Esto activa la compuerta de aprobación nativa de GitHub
+      name: production
     steps:
       - name: Promocionar Modelo a Ambiente de Producción
         run: |
