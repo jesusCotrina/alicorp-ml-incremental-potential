@@ -1,0 +1,49 @@
+name: Pipeline MLOps - Alicorp Incremental Potential
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # TRABAJO 1: Control de calidad del software y datos
+  pruebas_y_calidad:
+    runs-on: self-hosted # Ejecuta en tu máquina local vía el Runner
+    steps:
+      - name: Descargar Código del Repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar Dependencias del Entorno
+        run: |
+          pip install pytest pandas numpy xgboost mlflow
+
+      - name: Ejecutar Tests Automatizados
+        run: |
+          # Corre las pruebas del archivo test_pipeline.py
+          pytest test_pipeline.py -v
+
+  # TRABAJO 2: Entrenamiento y Promoción Automática a Staging (Pruebas)
+  entrenamiento_y_staging:
+    needs: pruebas_y_calidad
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Ejecutar Entrenamiento Completo
+        run: |
+          python train.py
+
+      - name: Promocionar Modelo a Ambiente Staging
+        run: |
+          python promote_model.py staging
+
+  # TRABAJO 3: Despliegue a Producción bajo Aprobación Manual
+  despliegue_produccion:
+    needs: entrenamiento_y_staging
+    runs-on: self-hosted
+    environment:
+      name: production # Esto activa la compuerta de aprobación nativa de GitHub
+    steps:
+      - name: Promocionar Modelo a Ambiente de Producción
+        run: |
+          python promote_model.py production
