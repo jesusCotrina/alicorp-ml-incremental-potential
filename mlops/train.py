@@ -9,6 +9,13 @@ from lightgbm import LGBMClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
+import sys
+import io
+
+# Forzar codificación UTF-8 para evitar errores de caracteres especiales en Windows
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8')
+
 
 # Configuración inicial
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
