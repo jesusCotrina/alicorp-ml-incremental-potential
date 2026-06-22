@@ -1,0 +1,14 @@
+name: Pipeline Inferencia Batch Semanal
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Se ejecuta todos los lunes a las 00:00 (1 vez por semana)
+
+jobs:
+  inferencia:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - name: Ejecutar Inferencia
+        run: |
+          python inference/batch_inference.py

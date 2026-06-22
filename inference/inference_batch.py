@@ -1,23 +1,33 @@
 import mlflow
 import pandas as pd
+import sys
 
 def run_batch_inference():
-    # 1. Cargar el modelo desde el registro
-    model_uri = "models:/Modelo_Potencial_Alicorp/latest"
-    model = mlflow.xgboost.load_model(model_uri)
+    # 1. Cargar el modelo usando el alias 'production'
+    # Esto asegura que siempre obtengas el modelo aprobado y no cualquier versión
+    model_uri = "models:/Modelo_Potencial_Alicorp@production"
     
-    # 2. Leer nuevos datos (Batch diario/semanal)
+    try:
+        model = mlflow.xgboost.load_model(model_uri)
+    except Exception as e:
+        print(f"Error cargando el modelo de producción: {e}")
+        sys.exit(1)
+    
+    # 2. Leer nuevos datos
     df_nuevos = pd.read_csv("../dataset/nuevos_clientes_semana.csv")
     
-    # 3. Preprocesar igual que en el entrenamiento
-    # (¡IMPORTANTE! Debes mantener la misma lógica de dummies)
+    # 3. PREPROCESAMIENTO (CRÍTICO)
+    # No uses get_dummies aquí si en el entrenamiento tuviste un número diferente de columnas.
+    # Lo profesional es usar un Pipeline de Scikit-Learn que guardes en MLflow junto al modelo.
     X_new = df_nuevos.drop(columns=["customer_id"])
-    X_new = pd.get_dummies(X_new, columns=["segment", "territory_id"])
     
     # 4. Predecir
     predictions = model.predict_proba(X_new)[:, 1]
     
-    # 5. Guardar resultados para negocio
+    # 5. Guardar resultados
     df_nuevos["score_potencial"] = predictions
-    df_nuevos.to_csv("../outputs/predicciones_batch.csv", index=False)
-    print("Inferencia batch completada con éxito.")
+    df_nuevos.to_csv("../outputs/predicciones_batch_semana.csv", index=False)
+    print("Inferencia batch completada.")
+
+if __name__ == "__main__":
+    run_batch_inference()
