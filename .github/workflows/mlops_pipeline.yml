@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   pruebas_y_calidad:
-    runs-on: self-hosted
+    runs-on: [self-hosted, personal]
     steps:
       - name: Checkout del código
         uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
 
   entrenamiento_y_staging:
     needs: pruebas_y_calidad
-    runs-on: self-hosted
+    runs-on: [self-hosted, personal]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Entrenamiento
@@ -40,7 +40,7 @@ jobs:
 
   despliegue_produccion:
     needs: entrenamiento_y_staging
-    runs-on: self-hosted
+    runs-on: [self-hosted, personal]
     environment: 
       name: production
     steps:

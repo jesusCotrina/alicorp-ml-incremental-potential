@@ -1,48 +1,82 @@
 # Modelo Predictivo: Potencial Incremental Alicorp
 
-## Descripcion del Proyecto
-Este proyecto desarrolla un modelo predictivo para identificar clientes B2B con potencial de crecimiento incremental. La solucion abarca desde el preprocesamiento de datos transaccionales, ingenieria de variables temporales, entrenamiento optimizado con Optuna y un pipeline de MLOps para el despliegue y monitoreo.
+## Descripción del Proyecto
+
+Este proyecto desarrolla un modelo predictivo para identificar clientes B2B con potencial de crecimiento incremental. La solución abarca desde el preprocesamiento de datos transaccionales, ingeniería de variables temporales, entrenamiento optimizado con Optuna y un pipeline de MLOps para el despliegue y monitoreo.
 
 ## Estructura del Repositorio
-- /mlops: Scripts principales de entrenamiento, promocion y despliegue.
-- /dataset: Almacenamiento de datos (CSV) y datasets procesados.
-- /config: Archivos de configuracion y mejores parametros del modelo.
-- /test: Pruebas unitarias para validar el pipeline.
-- .github/workflows: Configuracion del CI/CD de GitHub Actions.
+
+/mlops: Scripts principales de entrenamiento, promoción y despliegue.
+
+/dataset: Almacenamiento de datos (CSV) y datasets procesados.
+
+/config: Archivos de configuración y mejores parámetros del modelo.
+
+/test: Pruebas unitarias para validar el pipeline.
+
+.github/workflows: Configuración del CI/CD de GitHub Actions.
 
 ## Requisitos Previstos
-Asegurate de tener Python 3.10+ instalado. Instala las dependencias:
+
+Se requiere tener Python 3.12+ instalado. La instalación de las dependencias se realiza mediante el siguiente comando:
+
+```bash
 pip install -r requirements.txt
+```
 
-## Ejecucion de MLflow
-El registro de modelos se gestiona mediante MLflow con un backend local en SQLite. Para iniciar el servidor de seguimiento y visualizar tus experimentos:
+## Instalación y Ejecución de MLflow
 
-1. Navega a la carpeta del proyecto.
-2. Ejecuta el siguiente comando:
-   mlflow ui --backend-store-uri sqlite:///mlflow.db
+El registro de modelos se gestiona mediante MLflow con un backend local en SQLite. Para realizar la instalación de la herramienta y el posterior despliegue del servidor de seguimiento con el fin de visualizar los experimentos, se deben seguir estos pasos:
 
-Esto levantara una interfaz en http://127.0.0.1:5000 donde podras gestionar los modelos registrados.
+Instalar la librería en el entorno de trabajo:
 
-## Configuracion de GitHub Actions (Self-Hosted Runner)
-Para ejecutar el pipeline de CI/CD en tu servidor local o maquina de desarrollo:
+```bash
+pip install mlflow
+```
 
-1. Ve a tu repositorio en GitHub > Settings > Actions > Runners.
-2. Haz clic en "New self-hosted runner".
-3. Sigue las instrucciones de descarga segun tu sistema operativo.
-4. Antes de iniciar, configura el runner ejecutando el script de configuracion:
-   .\config.cmd  # En Windows
-5. Una vez configurado, inicia el servicio:
-   .\run.cmd
+Navegar a la carpeta del proyecto.
 
-El runner debe mantenerse abierto para que GitHub pueda enviar los trabajos al pipeline.
+Ejecutar el siguiente comando para iniciar el servidor de seguimiento:
+
+```bash
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+Este proceso levantará una interfaz en http://127.0.0.1:5000 donde se pueden gestionar los modelos registrados de forma centralizada.
+
+## Configuración de GitHub Actions (Self-Hosted Runner)
+
+Para ejecutar el pipeline de CI/CD en un servidor local o máquina de desarrollo:
+
+Acceder al repositorio en GitHub y dirigirse a Settings > Actions > Runners.
+
+Hacer clic en "New self-hosted runner".
+
+Seguir las instrucciones de descarga según el sistema operativo utilizado.
+
+Antes de iniciar, configurar el runner ejecutando el script de configuración:
+
+```bash
+.\config.cmd  # En Windows
+```
+
+Una vez configurado, iniciar el servicio:
+
+```bash
+.\run.cmd
+```
+
+El runner debe mantenerse en ejecución para que GitHub pueda enviar los trabajos al pipeline correspondiente.
 
 ## Pipeline de Entrenamiento y Despliegue
+
 El proyecto utiliza GitHub Actions para automatizar el ciclo de vida del modelo:
 
-1. Pruebas: Ejecucion automatica de `pytest` sobre el dataset procesado.
-2. Entrenamiento: Ejecucion de `train.py` para entrenar y registrar en MLflow.
-3. Staging: Promocion automatica a ambiente de pruebas.
-4. Produccion: Despliegue protegido por aprobacion manual en el entorno de `production` definido en GitHub.
+* Pruebas: Ejecución automática de pytest sobre el dataset procesado.
+* Entrenamiento: Ejecución de train.py para entrenar y registrar el modelo en MLflow.
+* Staging: Promoción automática al ambiente de pruebas.
+* Producción: Despliegue protegido por aprobación manual en el entorno de production definido en GitHub.
 
 ## Monitoreo
-Se utiliza Evidently AI para detectar Data Drift y Concept Drift. Tras cada inferencia batch, se genera un reporte HTML en la carpeta /reports que compara la distribucion actual contra el set de entrenamiento.
+
+Se utiliza Evidently AI para detectar Data Drift y Concept Drift. Tras cada inferencia batch, se genera un reporte HTML en la carpeta /reports que compara la distribución actual contra el set de entrenamiento.
