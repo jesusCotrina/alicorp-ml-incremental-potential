@@ -20,9 +20,29 @@ def promote_model(alias_name):
             
         latest_version = sorted(versions, key=lambda x: int(x.version))[-1].version
         
-        # 4. Asignar el Alias (La nueva forma recomendada)
+        # 4. Asignar el Alias
         print(f"Asignando alias '{alias_name}' a {model_name} (versión {latest_version})...")
         
+        if alias_name == "production":
+            try:
+                staging_version = client.get_model_version_by_alias(
+                    model_name,
+                    "staging"
+                )
+
+                client.delete_registered_model_alias(
+                    model_name,
+                    "staging"
+                )
+
+                print(
+                    f"Alias 'staging' eliminado "
+                    f"(apuntaba a v{staging_version.version})"
+                )
+
+            except Exception:
+                print("No existe alias 'staging' activo.")
+
         client.set_registered_model_alias(
             name=model_name,
             alias=alias_name,
